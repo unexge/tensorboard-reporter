@@ -1,16 +1,12 @@
-from typing import Iterable, NamedTuple
+from typing import Iterable, Dict, List
 import os
 from glob import glob
+from collections import defaultdict
 
 import tensorflow as tf  # type: ignore
 from tensorflow.core.util import event_pb2  # type: ignore
 
-
-class Summary(NamedTuple):
-    wall_time: float
-    step: int
-    value: float
-    tag: str
+from tbr.summary import Summary
 
 
 def load_summaries(run_dir: str) -> Iterable[Summary]:
@@ -43,3 +39,12 @@ def load_summaries(run_dir: str) -> Iterable[Summary]:
                     )
                 except ValueError:
                     continue
+
+
+def group_by_tag(summaries: Iterable[Summary]) -> Dict[str, List[Summary]]:
+    tags: Dict[str, List[Summary]] = defaultdict(list)
+
+    for summary in summaries:
+        tags[summary.tag].append(summary)
+
+    return tags
