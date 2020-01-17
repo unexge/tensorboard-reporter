@@ -11,4 +11,4 @@ def current_mean(summaries: List[Summary], fraction=0.1) -> Optional[float]:
 
     last_part = max(1, int(len(summaries) * fraction))
 
-    return np.mean(summaries[-last_part:])
+    return np.mean(list(map(lambda x: x.value, summaries[-last_part:])))

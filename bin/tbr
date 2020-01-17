@@ -29,5 +29,10 @@ while True:
         ),
         summaries,
     )
+    summaries = list(summaries)
 
-    print(f"current_mean -> {current_mean(summaries)}")
+    mean = current_mean(summaries)
+    if mean is None:
+        print(f"no data found for last {args.interval_hour} hours")
+    else:
+        print(f"current mean for last {args.interval_hour} hours -> {mean}")
