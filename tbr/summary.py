@@ -12,7 +12,7 @@ class Summary(NamedTuple):
 def wall_time_in_range(
     *, min: Optional[datetime], max: Optional[datetime]
 ) -> Callable[[Summary], bool]:
-    def predicate(x: Summary):
+    def predicate(x: Summary) -> bool:
         if min is not None and min.timestamp() > x.wall_time:
             return False
 

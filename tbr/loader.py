@@ -15,7 +15,7 @@ def load_summaries(run_dir: str) -> Iterable[Summary]:
     it = filter(
         lambda x: x.WhichOneof("what") == "summary",
         map(
-            lambda x: event_pb2.Event.FromString(x.numpy()),
+            lambda x: event_pb2.Event.FromString(x.numpy()),  # type: ignore
             tf.data.TFRecordDataset(event_files),
         ),
     )

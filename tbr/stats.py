@@ -2,13 +2,13 @@ from typing import List, Optional
 
 import numpy as np  # type: ignore
 
-from tbr.loader import Summary
+from tbr.summary import Summary
 
 
-def current_mean(summaries: List[Summary], fraction=0.1) -> Optional[float]:
+def current_mean(summaries: List[Summary], fraction: float = 0.1) -> Optional[float]:
     if len(summaries) == 0:
         return None
 
     last_part = max(1, int(len(summaries) * fraction))
 
-    return np.mean(list(map(lambda x: x.value, summaries[-last_part:])))
+    return float(np.mean(list(map(lambda x: x.value, summaries[-last_part:]))))
