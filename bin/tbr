@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
+import os
 import argparse
 from datetime import datetime, timedelta
 import time
+
+import slack  # type: ignore
 
 from tbr.loader import load_summaries
 from tbr.summary import tag, wall_time_in_range
@@ -12,11 +15,25 @@ from tbr.stats import current_mean
 parser = argparse.ArgumentParser(
     description="Get reports for your training process via Slack"
 )
-parser.add_argument("run_dir", type=str, help="tensorboard run dir")
-parser.add_argument("tag", type=str, help="tag to report")
-parser.add_argument("interval_hour", type=int, help="report interval hour")
+required = parser.add_argument_group("required arguments")
+required.add_argument("--run_dir", type=str, help="tensorboard run dir", required=True)
+required.add_argument("--tag", type=str, help="tag to report", required=True)
+required.add_argument(
+    "--interval_hour", type=int, help="report interval hour", required=True
+)
+required.add_argument(
+    "--slack_channel",
+    type=str,
+    help="slack channel to which messages will be sent (can be user id)",
+    required=True,
+)
 
 args = parser.parse_args()
+
+SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
+assert SLACK_BOT_TOKEN is not None, "missing `SLACK_BOT_TOKEN` env variable"
+
+client = slack.WebClient(token=SLACK_BOT_TOKEN)
 
 while True:
     time.sleep(args.interval_hour * 60 * 60)
@@ -32,7 +49,12 @@ while True:
     summaries = list(summaries)
 
     mean = current_mean(summaries)
-    if mean is None:
-        print(f"no data found for last {args.interval_hour} hours")
-    else:
-        print(f"current mean for last {args.interval_hour} hours -> {mean}")
+
+    message = (
+        f"no data found for last {args.interval_hour} hours"
+        if mean is None
+        else f"current mean for last {args.interval_hour} hours -> {mean}"
+    )
+
+    print(message)
+    client.chat_postMessage(channel=args.slack_channel, text=message)
