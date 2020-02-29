@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import numpy as np  # type: ignore
 
-from tbr.summary import Summary
+from tensorboard_reporter.summary import Summary
 
 
 def current_mean(summaries: List[Summary], fraction: float = 0.1) -> Optional[float]:

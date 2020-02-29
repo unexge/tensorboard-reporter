@@ -6,7 +6,7 @@ from collections import defaultdict
 import tensorflow as tf  # type: ignore
 from tensorflow.core.util import event_pb2  # type: ignore
 
-from tbr.summary import Summary
+from tensorboard_reporter.summary import Summary
 
 
 def load_summaries(run_dir: str) -> Iterable[Summary]:

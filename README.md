@@ -5,8 +5,8 @@
 Get reports for your training process via Slack.
 
 ```bash
-SLACK_BOT_TOKEN="xoxb-abc-1232" tbr \
+SLACK_BOT_TOKEN="xoxb-abc-1232" tensorboard-reporter \
  --run_dir ./ray_results/PPO_your_env_2020-01-18_08-49-01gdbkyles \
  --tag ray/tune/episode_reward_mean \
- --interval_hour 1 --slack_channel "#tbr"
+ --interval_hour 1 --slack_channel "#tensorboard-reports"
 ```

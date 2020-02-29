@@ -7,9 +7,9 @@ import time
 
 import slack  # type: ignore
 
-from tbr.loader import load_summaries
-from tbr.summary import tag, wall_time_in_range
-from tbr.stats import current_mean
+from tensorboard_reporter.loader import load_summaries
+from tensorboard_reporter.summary import tag, wall_time_in_range
+from tensorboard_reporter.stats import current_mean
 
 
 parser = argparse.ArgumentParser(
