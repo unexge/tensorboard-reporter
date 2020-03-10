@@ -4,9 +4,23 @@
 
 Get reports for your training process via Slack.
 
+## Setup
+
+Install TensorBoard Reporter from pip
+
+```bash
+pip install tensorboard-reporter
+```
+
+Configure your report
+
 ```bash
 SLACK_BOT_TOKEN="xoxb-abc-1232" tensorboard-reporter \
- --run_dir ./ray_results/PPO_your_env_2020-01-18_08-49-01gdbkyles \
- --tag ray/tune/episode_reward_mean \
- --interval_hour 1 --slack_channel "#tensorboard-reports"
+ --run_dir ./runs/Mar10_15-00-24_ip-127-0-0-1 \
+ --tag "Test/loss" --tag "Train/loss" \
+ --interval_hour 1 --slack_channels "#tensorboard-reports"
 ```
+
+And get reports to your Slack periodically
+
+![Example](./example.png)
