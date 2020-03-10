@@ -85,10 +85,12 @@ while True:
 
     with tempfile.NamedTemporaryFile() as file:
         fig.savefig(file.name, format="png")
-        response = client.files_upload(
+        client.files_upload(
             channels=args.slack_channels,
             file=file.name,
             title="Report_{}".format(str(datetime.now())),
             initial_comment=summary_text,
         )
+
+    print(summary_text)
 
