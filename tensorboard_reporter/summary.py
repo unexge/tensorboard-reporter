@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional, Callable
+from typing import NamedTuple, Optional, Callable, List
 from datetime import datetime
 
 
@@ -26,3 +26,7 @@ def wall_time_in_range(
 
 def tag(tag: str) -> Callable[[Summary], bool]:
     return lambda x: x.tag == tag
+
+
+def tags(tags: List[str]) -> Callable[[Summary], bool]:
+    return lambda x: x.tag in tags
