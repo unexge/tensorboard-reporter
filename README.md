@@ -1,6 +1,6 @@
 # TensorBoard Reporter
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![PyPI Link https://pypi.org/project/tensorboard-reporter/](https://img.shields.io/pypi/v/tensorboard-reporter)](https://pypi.org/project/tensorboard-reporter/)
 
 Get reports for your training process via Slack.
 
