@@ -1,16 +1,16 @@
 from typing import Iterable, Dict, List
 import os
-from glob import glob
+from pathlib import Path
 from collections import defaultdict
 
 import tensorflow as tf  # type: ignore
 from tensorflow.core.util import event_pb2  # type: ignore
-
 from tensorboard_reporter.summary import Summary
+from tqdm import tqdm
 
 
 def load_summaries(run_dir: str) -> Iterable[Summary]:
-    event_files = glob(os.path.join(run_dir, "*.tfevents.*"))
+    event_files = list(map(Path.as_posix, Path(run_dir).rglob("*.tfevents.*")))
 
     it = filter(
         lambda x: x.WhichOneof("what") == "summary",
@@ -37,7 +37,7 @@ def load_summaries(run_dir: str) -> Iterable[Summary]:
                         tag=value.tag,
                         value=float(tf.make_ndarray(value.tensor)),
                     )
-                except ValueError:
+                except (ValueError, TypeError):
                     continue
 
 
