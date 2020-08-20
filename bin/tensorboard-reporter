@@ -92,4 +92,8 @@ while True:
             )
 
     print(summary_text)
-    time.sleep(int(args.interval_hour * 60 * 60))
+
+    # waiting with progress bar
+    wait_s = int(args.interval_hour * 60 * 60)
+    time_iter = iter(time.sleep(1) for i in range(wait_s))
+    list(tqdm(time_iter, 'next report in', wait_s, bar_format='{desc}: {remaining} |{bar}|'))

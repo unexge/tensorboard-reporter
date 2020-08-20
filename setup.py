@@ -27,4 +27,5 @@ setuptools.setup(
         "slackclient",
         "tensorflow",
         "numpy",
+        "tqdm",
     ])
