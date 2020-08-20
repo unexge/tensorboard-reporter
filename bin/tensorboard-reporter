@@ -1,37 +1,24 @@
 #!/usr/bin/env python3
 
-import os
 import argparse
-from datetime import datetime, timedelta
-import time
-import tempfile
-
-import numpy as np
 import matplotlib.pyplot as plt  # type: ignore
+import numpy as np
 import slack  # type: ignore
-
-from tensorboard_reporter.loader import load_summaries, group_by_tag
-from tensorboard_reporter.summary import tags, wall_time_in_range
-from tensorboard_reporter.stats import current_mean
-
+import tempfile
+import time
+from datetime import datetime, timedelta
 
 parser = argparse.ArgumentParser(
     description="Get reports for your training process via Slack"
 )
 required = parser.add_argument_group("required arguments")
 required.add_argument("--run_dir", type=str, help="tensorboard run dir", required=True)
-required.add_argument(
-    "--tag", type=str, action="append", help="tags to report", required=True
-)
-required.add_argument(
-    "--interval_hour", type=int, help="report interval hour", required=True
-)
-required.add_argument(
-    "--slack_channels",
-    type=str,
-    help="slack channels (comma seperated) which messages will be sent (can be user ids)",
-    required=True,
-)
+required.add_argument("--interval_hour", type=float, help="report interval hour", required=True)
+required.add_argument("--slack_channels", type=str, required=True,
+                      help="slack channels (comma separated) which messages will be sent (can be user ids)",
+                      )
+required.add_argument("--tag", type=str, action="append", help="tags to report. Default: all tags")
+required.add_argument("--all_time", action='store_true', help="include all summaries (even old ones). Default:False")
 
 args = parser.parse_args()
 
@@ -40,21 +27,31 @@ assert SLACK_BOT_TOKEN is not None, "missing `SLACK_BOT_TOKEN` env variable"
 
 client = slack.WebClient(token=SLACK_BOT_TOKEN)
 
+# these imports take time, keep them after argparse in case of bad args
+from tensorboard_reporter.loader import load_summaries, group_by_tag
+from tensorboard_reporter.stats import current_mean
+from tensorboard_reporter.summary import tags, wall_time_in_range
+
 while True:
-    time.sleep(args.interval_hour * 60 * 60)
+    print('Time for a report!')
 
-    tags_to_report = args.tag
+    summaries = list(load_summaries(args.run_dir))
 
-    summaries = load_summaries(args.run_dir)
+    tags_to_report = args.tag or [s.tag for s in summaries]  # fallback to all tags
     summaries = filter(tags(tags_to_report), summaries)
-    summaries = filter(
-        wall_time_in_range(
-            min=datetime.now() - timedelta(hours=args.interval_hour), max=None
-        ),
-        summaries,
-    )
+    print(f'found {len(list(summaries))} summaries')
+
+    if not args.all_time:
+        summaries = filter(
+            wall_time_in_range(
+                min=datetime.now() - timedelta(hours=args.interval_hour), max=None
+            ),
+            summaries,
+        )
+        print(f'found {len(list(summaries))} summaries matching walltime')
 
     summaries_by_tag = group_by_tag(summaries)
+    print(f'{len(list(summaries_by_tag))} summaries groupted by tags')
 
     fig, axs = plt.subplots(len(tags_to_report), sharex=True)
 
@@ -83,14 +80,15 @@ while True:
             tag, stats["min"], stats["max"], stats["mean"]
         )
 
-    with tempfile.NamedTemporaryFile() as file:
-        fig.savefig(file.name, format="png")
-        client.files_upload(
-            channels=args.slack_channels,
-            file=file.name,
-            title="Report_{}".format(str(datetime.now())),
-            initial_comment=summary_text,
-        )
+    if stats_by_tag:
+        with tempfile.NamedTemporaryFile() as file:
+            fig.savefig(file.name, format="png")
+            client.files_upload(
+                channels=args.slack_channels,
+                file=file.name,
+                title="Report_{}".format(str(datetime.now())),
+                initial_comment=summary_text,
+            )
 
     print(summary_text)
-
+    time.sleep(int(args.interval_hour * 60 * 60))
