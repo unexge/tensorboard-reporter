@@ -22,4 +22,10 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     scripts=["bin/tensorboard-reporter"],
-)
+    install_requires=[
+        "slack",
+        "slackclient",
+        "tensorflow",
+        "numpy",
+        "tqdm",
+    ])
