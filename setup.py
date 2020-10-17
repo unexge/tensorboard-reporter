@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tensorboard-reporter",
-    version="0.0.3",
+    version="0.0.4",
     author="unexge",
     author_email="unexge@gmail.com",
     description="Get reports for your training process via Slack",
