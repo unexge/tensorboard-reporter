@@ -15,12 +15,23 @@ parser = argparse.ArgumentParser(
 )
 required = parser.add_argument_group("required arguments")
 required.add_argument("--run_dir", type=str, help="tensorboard run dir", required=True)
-required.add_argument("--interval_hour", type=float, help="report interval hour", required=True)
-required.add_argument("--slack_channels", type=str, required=True,
-                      help="slack channels (comma separated) which messages will be sent (can be user ids)",
-                      )
-required.add_argument("--tag", type=str, action="append", help="tags to report. Default: all tags")
-required.add_argument("--all_time", action='store_true', help="include all summaries (even old ones). Default:False")
+required.add_argument(
+    "--interval_hour", type=float, help="report interval hour", required=True
+)
+required.add_argument(
+    "--slack_channels",
+    type=str,
+    required=True,
+    help="slack channels (comma separated) which messages will be sent (can be user ids)",
+)
+required.add_argument(
+    "--tag", type=str, action="append", help="tags to report. Default: all tags"
+)
+required.add_argument(
+    "--all_time",
+    action="store_true",
+    help="include all summaries (even old ones). Default:False",
+)
 
 args = parser.parse_args()
 
@@ -35,25 +46,29 @@ from tensorboard_reporter.stats import current_mean
 from tensorboard_reporter.summary import tags, wall_time_in_range
 
 while True:
-    print('Time for a report!')
+    print("Time for a report!")
 
     summaries = list(load_summaries(args.run_dir))
 
-    tags_to_report = args.tag or [s.tag for s in summaries]  # fallback to all tags
-    summaries = filter(tags(tags_to_report), summaries)
-    print(f'found {len(list(summaries))} summaries')
+    tags_to_report = args.tag or list(
+        set([s.tag for s in summaries])
+    )  # fallback to all tags
+    summaries = list(filter(tags(tags_to_report), summaries))
+    print(f"found {len(summaries)} summaries")
 
     if not args.all_time:
-        summaries = filter(
-            wall_time_in_range(
-                min=datetime.now() - timedelta(hours=args.interval_hour), max=None
-            ),
-            summaries,
+        summaries = list(
+            filter(
+                wall_time_in_range(
+                    min=datetime.now() - timedelta(hours=args.interval_hour), max=None
+                ),
+                summaries,
+            )
         )
-        print(f'found {len(list(summaries))} summaries matching walltime')
+        print(f"found {len(summaries)} summaries matching walltime")
 
     summaries_by_tag = group_by_tag(summaries)
-    print(f'{len(list(summaries_by_tag))} summaries groupted by tags')
+    print(f"{len(summaries_by_tag)} summaries groupted by tags")
 
     fig, axs = plt.subplots(len(tags_to_report), sharex=True)
 
@@ -97,4 +112,11 @@ while True:
     # waiting with progress bar
     wait_s = int(args.interval_hour * 60 * 60)
     time_iter = iter(time.sleep(1) for i in range(wait_s))
-    list(tqdm(time_iter, 'next report in', wait_s, bar_format='{desc}: {remaining} |{bar}|'))
+    list(
+        tqdm(
+            time_iter,
+            "next report in",
+            wait_s,
+            bar_format="{desc}: {remaining} |{bar}|",
+        )
+    )
