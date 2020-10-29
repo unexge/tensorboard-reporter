@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tensorboard-reporter",
-    version="0.0.4",
+    version="0.0.5",
     author="unexge",
     author_email="unexge@gmail.com",
     description="Get reports for your training process via Slack",
@@ -22,10 +22,5 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     scripts=["bin/tensorboard-reporter"],
-    install_requires=[
-        "slack",
-        "slackclient",
-        "tensorflow",
-        "numpy",
-        "tqdm",
-    ])
+    install_requires=["slack", "slackclient", "tensorflow", "numpy", "tqdm",],
+)
